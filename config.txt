@@ -9,6 +9,7 @@ optionsFeat = PreferredName
 outputASName = Key
 includeNoneOfAbove = true
 includeSpurious = true
+includeNIL = true
 
 #mode = OPTIONSFROMFEATURE
 #inputASName = null

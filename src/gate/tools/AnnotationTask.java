@@ -7,22 +7,23 @@ import gate.Factory;
 import gate.FeatureMap;
 import gate.Utils;
 
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 public class AnnotationTask {
 
-  static int NONEOFABOVE = 10001;
-  static int SPURIOUS = 10002;
-  static int UNDONE = 10003;
+  static final int NONEOFABOVE = 10001;
+  static final int SPURIOUS = 10002;
+  static final int UNDONE = 10003;
+  static final int NIL = 10004;
 
-  static String noneofabove = "<NONE OF ABOVE>";
-  static String spurious = "<SPURIOUS>";
-  static String undone = "<NOT DONE>";
+  static final String NONEOFABOVE_LABEL = "<NONE OF ABOVE>";
+  static final String SPURIOUS_LABEL = "<SPURIOUS>";
+  static final String UNDONE_LABEL = "<NOT DONE>";
+  static final String NIL_LABEL = "<NIL>";
+  
+  static final String NIL_VALUE = "";
 
   static String noteType = "annotation-note";
 
@@ -61,11 +62,11 @@ public class AnnotationTask {
         prev = previouslySelected.getFeatures().get(config.outputFeat);
       }
       if (prev instanceof String) {
-        if (prev != null && ((String) prev).equals(noneofabove)) {
+        if (prev != null && ((String) prev).equals(NONEOFABOVE_LABEL)) {
           indexOfSelected = NONEOFABOVE;
-        } else if (prev != null && prev.equals(spurious)) {
+        } else if (prev != null && prev.equals(SPURIOUS_LABEL)) {
           indexOfSelected = SPURIOUS;
-        } else if (prev != null && prev.equals(undone)) {
+        } else if (prev != null && prev.equals(UNDONE_LABEL)) {
           indexOfSelected = UNDONE;
         }
       }
@@ -124,8 +125,34 @@ public class AnnotationTask {
               }
               opindex++;
             }
-          // TODO: could add arrays here ...
-          // } else if (featureValue instanceof String[])   
+          } else if(featureValue instanceof String) {
+            // if the featureValue is a string and the listSeparator is specified in the config,
+            // split the String 
+            if(config.listSeparator != null) {
+              String values[] = ((String)featureValue).split(config.listSeparator,-1);
+              int opindex = 0;
+              for (String whateveritis : values) {
+                this.optionsObjects[opindex] = whateveritis;
+                this.options[opindex] = whateveritis;
+                if (prev != null && whateveritis.equals(prev)) {
+                  indexOfSelected = opindex;
+                }
+                opindex++;
+              }
+            } else {
+              System.err.println("Feature is a String but no listSeparator " + currentDoc.getName() + " annotation " + thisAnn);              
+            }
+          } else if (featureValue instanceof String[]) {
+            int opindex = 0;
+            for (String whateveritis : ((String[])featureValue)) {
+              this.optionsObjects[opindex] = whateveritis;
+              this.options[opindex] = whateveritis;
+              if (prev != null && whateveritis.equals(prev)) {
+                indexOfSelected = opindex;
+              }
+              opindex++;
+            }
+            
           } else { // not a supported type
             // log this as an error
             System.err.println("Feature is not an Iterable in document " + currentDoc.getName() + " annotation " + thisAnn);
@@ -159,15 +186,18 @@ public class AnnotationTask {
 
     switch (config.mode) {
       case OPTIONSFROMTYPEANDFEATURE:
-        if (AnnotationTask.spurious.equals(action) && config.includeSpurious) {
-          fm.put(config.optionsFeat, AnnotationTask.spurious);
+        if (AnnotationTask.SPURIOUS_LABEL.equals(action) && config.includeSpurious) {
+          fm.put(config.optionsFeat, AnnotationTask.SPURIOUS_LABEL);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
           this.indexOfSelected = AnnotationTask.SPURIOUS;
-        } else if (AnnotationTask.noneofabove.equals(action) && config.includeNoneOfAbove) {
-          fm.put(config.optionsFeat, AnnotationTask.noneofabove);
+        } else if (AnnotationTask.NIL_LABEL.equals(action)) {
+          fm.put(config.outputFeat, AnnotationTask.NIL_VALUE);
+          Utils.addAnn(outputAS, mention, config.mentionType, fm);
+        } else if (AnnotationTask.NONEOFABOVE_LABEL.equals(action) && config.includeNoneOfAbove) {
+          fm.put(config.optionsFeat, AnnotationTask.NONEOFABOVE_LABEL);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
           this.indexOfSelected = AnnotationTask.NONEOFABOVE;
-        } else if (AnnotationTask.undone.equals(action)) {
+        } else if (AnnotationTask.UNDONE_LABEL.equals(action)) {
           //Nothing to do, we already removed it
           this.indexOfSelected = AnnotationTask.UNDONE;
         } else { //We have a potential option
@@ -184,16 +214,19 @@ public class AnnotationTask {
         }
         break;
       case OPTIONSFROMFEATURE:
-        if (AnnotationTask.spurious.equals(action)) {
-          fm.put(config.outputFeat, AnnotationTask.spurious);
+        if (AnnotationTask.SPURIOUS_LABEL.equals(action)) {
+          fm.put(config.outputFeat, AnnotationTask.SPURIOUS_LABEL);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
           this.indexOfSelected = AnnotationTask.SPURIOUS;
-        } else if (AnnotationTask.noneofabove.equals(action)) {
-          fm.put(config.outputFeat, AnnotationTask.noneofabove);
+        } else if (AnnotationTask.NIL_LABEL.equals(action)) {
+          fm.put(config.outputFeat, AnnotationTask.NIL_VALUE);
+          Utils.addAnn(outputAS, mention, config.mentionType, fm);
+        } else if (AnnotationTask.NONEOFABOVE_LABEL.equals(action)) {
+          fm.put(config.outputFeat, AnnotationTask.NONEOFABOVE_LABEL);
           fm.put(noteType, this.note);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
           this.indexOfSelected = AnnotationTask.NONEOFABOVE;
-        } else if (AnnotationTask.undone.equals(action)) {
+        } else if (AnnotationTask.UNDONE_LABEL.equals(action)) {
           //Nothing to do, we already removed it
           this.indexOfSelected = AnnotationTask.UNDONE;
         } else { //We have an option
@@ -204,16 +237,19 @@ public class AnnotationTask {
         }
         break;
       case OPTIONSFROMSTRING:
-        if (AnnotationTask.spurious.equals(action)) {
-          fm.put(config.outputFeat, AnnotationTask.spurious);
+        if (AnnotationTask.SPURIOUS_LABEL.equals(action)) {
+          fm.put(config.outputFeat, AnnotationTask.SPURIOUS_LABEL);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
           this.indexOfSelected = AnnotationTask.SPURIOUS;
-        } else if (AnnotationTask.noneofabove.equals(action)) {
-          fm.put(config.outputFeat, AnnotationTask.noneofabove);
+        } else if (AnnotationTask.NIL_LABEL.equals(action)) {
+          fm.put(config.outputFeat, AnnotationTask.NIL_VALUE);
+          Utils.addAnn(outputAS, mention, config.mentionType, fm);
+        } else if (AnnotationTask.NONEOFABOVE_LABEL.equals(action)) {
+          fm.put(config.outputFeat, AnnotationTask.NONEOFABOVE_LABEL);
           fm.put(noteType, this.note);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
           this.indexOfSelected = AnnotationTask.NONEOFABOVE;
-        } else if (AnnotationTask.undone.equals(action)) {
+        } else if (AnnotationTask.UNDONE_LABEL.equals(action)) {
           //Nothing to do, we already removed it
           this.indexOfSelected = AnnotationTask.UNDONE;
         } else { //We have an option

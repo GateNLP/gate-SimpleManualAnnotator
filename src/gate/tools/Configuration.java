@@ -21,6 +21,8 @@ public class Configuration {
 	boolean includeNoneOfAbove = false;
 	boolean includeSpurious = true;
 	boolean autoadvance = true;
+        boolean includeNIL = true;
+        String listSeparator = null;
 
 	Configuration (File conf) {
 		populateConfigOptions(conf);
@@ -73,6 +75,13 @@ public class Configuration {
     	            case "includeSpurious":
     	            	includeSpurious = false;
     	            	if(pair[1].equals("true")) includeSpurious = true;
+	                    break;
+    	            case "includeNIL":
+    	            	includeNIL = false;
+    	            	if(pair[1].equals("true")) includeNIL = true;
+	                    break;
+    	            case "listSeparator":
+    	            	listSeparator = pair[1];
 	                    break;
     	            case "autoadvance":
     	            	autoadvance = true;

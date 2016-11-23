@@ -24,6 +24,10 @@ Your corpus of GATE documents needs to be prepared with annotations that describ
 - outputASName - Once the annotator has made their choice, an output annotation will be generated recording this. The output annotation set name indicates the annotation set you want these judgements to go into.
 - includeNoneOfAbove - In addition to the choices you provide, do you want the annotator to also see an automatically generated "none of the above" option? This would be used to indicate that the mention is valid, but that it was impossible to choose the correct choice from the ones provided. An example might be annotating locations as countries or cities, and receiving a location that is a county. The annotation is a valid location, but the "county" option wasn't available.
 - includeSpurious - In addition to the choices you provide, do you want the annotator to also see an automatically generated "spurious" option? This would be used to indicate that the mention is not a valid example of the type being annotated. For example, when annotating locations, if a mention is presented that isn't a location, this option would be used to indicate that.
+- includeNIL - In addition to the choices you provide, do you want the annotation to also see an automatically
+generated "NIL" option? This would be used to indicate that the mention is valid, but is known to not
+refer to any value. For example, when annotating the URI for locations, if the mention is indeed a location,
+but there is no URI to link it to, this would be the proper option to indicate that.
 
 **OPTIONSFROMSTRING**
 
@@ -40,6 +44,7 @@ is used for displaying it to the user.
 
 - optionsFeat - The feature on the mention that contains the choices.
 - outputFeat - The feature on the output annotations to contain the choice.
+- listSeparator - if ommited, none. If specified, the String to use to split a String value into a list of choices e.g. ; or |
 
 **OPTIONSFROMTYPEANDFEATURE**
 
