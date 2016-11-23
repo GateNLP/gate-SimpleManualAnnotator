@@ -34,7 +34,9 @@ In this mode, the options to be presented are specified as a semicolon-separated
 
 **OPTIONSFROMFEATURE**
 
-This option indicates that the choices to be provided to the annotator should be taken from a set provided in a feature on the mentions. This should be a Set object containing String objects.
+This option indicates that the choices to be provided to the annotator should be taken from a feature on the mentions. The feature can be
+any instance of an Iterable or Collectioni (e.g. a List or Set). If the collection contains objects other than String, the toString method
+is used for displaying it to the user.
 
 - optionsFeat - The feature on the mention that contains the choices.
 - outputFeat - The feature on the output annotations to contain the choice.
