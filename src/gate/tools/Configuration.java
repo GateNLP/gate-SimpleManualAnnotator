@@ -34,7 +34,7 @@ public class Configuration {
     	    String line;
     	    while ((line = br.readLine()) != null) {
     	       if(!line.startsWith("#") && line.contains(" = ")){
-    	    	   String[] pair = line.split(" = ");
+    	    	   String[] pair = line.split(" = ",-1);
     	    	   switch (pair[0]) {
     	            case "mode":
     	            	mode = Mode.valueOf(pair[1]);

@@ -75,16 +75,44 @@ public class AnnotationTask {
     mention = thisAnn;
 
     //Context
-    Annotation contextAnn = Utils.getOverlappingAnnotations(
+    if(config.contextType == null || config.contextType.isEmpty()) {
+      context = currentDoc.getContent().toString();
+      offset = 0;
+    } else {
+      Annotation contextAnn = Utils.getOverlappingAnnotations(
             inputAS, thisAnn, config.contextType).iterator().next();
-    context = Utils.stringFor(currentDoc, contextAnn);
-    offset = contextAnn.getStartNode().getOffset();
+      context = Utils.stringFor(currentDoc, contextAnn);
+      offset = contextAnn.getStartNode().getOffset();
+    }
+    
     startOfMention = thisAnn.getStartNode().getOffset();
     endOfMention = thisAnn.getEndNode().getOffset();
 
     //Options
     switch (config.mode) {
+      case OPTIONSFROMLISTANN:
+        List<Integer> ids = (List<Integer>)thisAnn.getFeatures().get("ids");
+        List<Annotation> optAnns = new ArrayList<Annotation>(ids.size());
+        for(int id : ids) {
+          optAnns.add(inputAS.get(id));
+        }
+        Iterator<Annotation> itanns = optAnns.iterator();
+        this.options = new String[optAnns.size()];
+        optionsObjects = new Annotation[optAnns.size()];
+        int indexA = 0;
+        while (itanns.hasNext()) {
+          Annotation optan = itanns.next();
+          String feat = optan.getFeatures().get(config.optionsFeat).toString();
+          this.options[indexA] = feat;
+          this.optionsObjects[indexA] = optan;
+          if (prev != null && feat.equals((String) prev)) {
+            indexOfSelected = indexA;
+          }
+          indexA++;
+        }
+        break;
       case OPTIONSFROMTYPEANDFEATURE:
+        // get the list of annotation ids from this annotation 
         AnnotationSet optans = Utils.getCoextensiveAnnotations(inputAS, thisAnn, config.optionsType);
         Iterator<Annotation> it = optans.iterator();
         this.options = new String[optans.size()];
@@ -185,6 +213,34 @@ public class AnnotationTask {
     FeatureMap fm = Factory.newFeatureMap();
 
     switch (config.mode) {
+      case OPTIONSFROMLISTANN:
+        if (AnnotationTask.SPURIOUS_LABEL.equals(action) && config.includeSpurious) {
+          fm.put(config.optionsFeat, AnnotationTask.SPURIOUS_LABEL);
+          Utils.addAnn(outputAS, mention, config.mentionType, fm);
+          this.indexOfSelected = AnnotationTask.SPURIOUS;
+        } else if (AnnotationTask.NIL_LABEL.equals(action)) {
+          fm.put(config.outputFeat, AnnotationTask.NIL_VALUE);
+          Utils.addAnn(outputAS, mention, config.mentionType, fm);
+        } else if (AnnotationTask.NONEOFABOVE_LABEL.equals(action) && config.includeNoneOfAbove) {
+          fm.put(config.optionsFeat, AnnotationTask.NONEOFABOVE_LABEL);
+          Utils.addAnn(outputAS, mention, config.mentionType, fm);
+          this.indexOfSelected = AnnotationTask.NONEOFABOVE;
+        } else if (AnnotationTask.UNDONE_LABEL.equals(action)) {
+          //Nothing to do, we already removed it
+          this.indexOfSelected = AnnotationTask.UNDONE;
+        } else { //We have a potential option
+          int opt = new Integer(action.substring(6)).intValue();
+          if (opt >= 0 && opt < optionsObjects.length) {
+            Annotation toAdd = (Annotation) optionsObjects[opt];
+            fm.putAll(toAdd.getFeatures());
+            Utils.addAnn(outputAS, mention, config.mentionType, fm);
+            this.indexOfSelected = opt;
+          } else {
+            System.out.println("Ignoring invalid option.");
+            return -1;
+          }
+        }
+        break;
       case OPTIONSFROMTYPEANDFEATURE:
         if (AnnotationTask.SPURIOUS_LABEL.equals(action) && config.includeSpurious) {
           fm.put(config.optionsFeat, AnnotationTask.SPURIOUS_LABEL);

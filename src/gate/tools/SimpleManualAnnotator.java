@@ -49,7 +49,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
    */
 
   public enum Mode {
-    OPTIONSFROMTYPEANDFEATURE, OPTIONSFROMFEATURE, OPTIONSFROMSTRING
+    OPTIONSFROMTYPEANDFEATURE, OPTIONSFROMFEATURE, OPTIONSFROMSTRING, OPTIONSFROMLISTANN,
   }
 
   static String backundone = "Last Undone";
@@ -66,6 +66,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
   ButtonGroup optionGroup = new ButtonGroup();
   JPanel optionsFrame = new JPanel();
   JTextField note = new JTextField(10);
+
 
   //Set at init
   File[] corpus;
@@ -88,14 +89,20 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
     dispFrame.setLayout(new BoxLayout(dispFrame, BoxLayout.Y_AXIS));
     dispFrame.setBackground(Color.WHITE);
 
+    JPanel progressFrame = new JPanel();
+    progressFrame.setLayout(new BoxLayout(progressFrame, BoxLayout.LINE_AXIS));
+    progressFrame.setPreferredSize(new Dimension(500, 47));
+    progressFrame.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.WHITE));
+    progressFrame.setBackground(Color.WHITE);
     progress = new JLabel();
-    progress.setPreferredSize(new Dimension(250, 40));
+    progress.setPreferredSize(new Dimension(400, 50));
     progress.setMinimumSize(new Dimension(10, 10));
-    dispFrame.add(progress);
-
+    progressFrame.add(progress);
+    dispFrame.add(progressFrame);
+    
     display.setEditable(false);
     display.setContentType("text/html");
-    display.setPreferredSize(new Dimension(250, 120));
+    display.setPreferredSize(new Dimension(500, 120));
     display.setMinimumSize(new Dimension(10, 10));
     display.setBackground(new Color(0.94F, 0.94F, 0.94F));
     display.setBorder(BorderFactory.createCompoundBorder(
@@ -113,13 +120,14 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
 
     JPanel noteFrame = new JPanel();
     noteFrame.setLayout(new BoxLayout(noteFrame, BoxLayout.LINE_AXIS));
-    noteFrame.setPreferredSize(new Dimension(250, 47));
+    noteFrame.setPreferredSize(new Dimension(500, 47));
     noteFrame.setBorder(BorderFactory.createMatteBorder(10, 10, 10, 10, Color.WHITE));
     noteFrame.setBackground(Color.WHITE);
     JLabel noteLabel = new JLabel();
     noteLabel.setText("Note: ");
     noteFrame.add(noteLabel);
     ScrollPane sp = new ScrollPane();
+    note.setEditable(true);
     sp.add(note);
     note.setBackground(new Color(0.94F, 0.94F, 0.94F));
     noteFrame.add(sp);
@@ -188,8 +196,8 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
 
   private static void createAndShowGUI(final SimpleManualAnnotator sma) {
     //Create and set up the window.
-    frame.setPreferredSize(new Dimension(700, 450));
-    frame.setMinimumSize(new Dimension(10, 10));
+    frame.setPreferredSize(new Dimension(1400, 450));
+    frame.setMinimumSize(new Dimension(50, 10));
 
     //Create and set up the content pane.
     sma.setOpaque(true); //content panes must be opaque
@@ -199,7 +207,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
     //Display the window.
     frame.pack();
     Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-    frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
+    frame.setLocation(dim.width / 4 - frame.getSize().width / 2, dim.height / 4 - frame.getSize().height / 2);
     frame.setVisible(true);
 
     frame.addWindowListener(sma.new MyWindowListener());
@@ -577,7 +585,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
   }
 
   private String progressReport() {
-    return (currentDocIndex + 1) + " of " + corpus.length + " docs, "
+    return currentDoc.getName() + ": " + (currentDocIndex + 1) + " of " + corpus.length + " docs, "
             + (currentAnnIndex + 1) + " of " + mentionsInDoc + " annotations.";
   }
 
@@ -606,6 +614,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       } else {
         System.out.println("Failed to access " + currentDoc.getName() + " for writing!");
       }
+      System.out.println("Document saved: "+currentDoc.getName());
     }
   }
 }
