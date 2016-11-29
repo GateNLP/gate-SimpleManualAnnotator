@@ -63,7 +63,7 @@ A shell script is provided with the distribution.
 
 ##Usage
 
-![GATE Simple Manual Annotator screenshot](https://raw.githubusercontent.com/GenevieveGorrell/gate-SimpleManualAnnotator/master/doc/Screenshot-GATESimpleManualAnnotator.png "GATE Simple Manual Annotator screenshot")
+![GATE Simple Manual Annotator screenshot](https://github.com/GateNLP/gate-SimpleManualAnnotator/raw/master/doc/Screenshot-GATESimpleManualAnnotator.png "GATE Simple Manual Annotator screenshot")
 
 The tool will automatically find the next un-done mention in the corpus to begin with. The position we are currently at in the corpus is indicated at the top. In the screenshot, we are on the first mention in the first document.
 
