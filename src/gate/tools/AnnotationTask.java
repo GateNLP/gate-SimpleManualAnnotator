@@ -56,10 +56,16 @@ public class AnnotationTask {
         note = previouslySelected.getFeatures().get(noteType).toString();
       }
 
-      if (config.mode == SimpleManualAnnotator.Mode.OPTIONSFROMTYPEANDFEATURE) {
-        prev = previouslySelected.getFeatures().get(config.optionsFeat);
-      } else {
+      if (null == config.mode) {
         prev = previouslySelected.getFeatures().get(config.outputFeat);
+      } else switch (config.mode) {
+        case OPTIONSFROMTYPEANDFEATURE:
+        case OPTIONSFROMLISTANN:
+          prev = previouslySelected.getFeatures().get(config.optionsFeat);
+          break;
+        default:
+          prev = previouslySelected.getFeatures().get(config.outputFeat);
+          break;
       }
       if (prev instanceof String) {
         if (prev != null && ((String) prev).equals(NONEOFABOVE_LABEL)) {
@@ -326,6 +332,8 @@ public class AnnotationTask {
     if (anns.size() > 0) {
       Annotation ann = anns.iterator().next();
       ann.getFeatures().put(noteType, this.note);
+    } else {
+      System.err.println("WARNING: note for UNDONE ignored in document "+currentDoc.getName()+": "+note);
     }
   }
 }

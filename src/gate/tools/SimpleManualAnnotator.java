@@ -323,26 +323,29 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
   }
 
   public void act(String what) {
-    if (!this.note.getText().equals(currentAnnotationTask.note)) {
-      //Note has changed, so if it's a none of above, we should write it
-      currentAnnotationTask.updateNote(this.note.getText());
-    }
 
     if (backundone.equals(what)) {
+      currentAnnotationTask.updateNote(this.note.getText());
       prev(true);
     } else if (back.equals(what)) {
+      currentAnnotationTask.updateNote(this.note.getText());
       prev(false);
     } else if (next.equals(what)) {
+      currentAnnotationTask.updateNote(this.note.getText());
       next(false);
     } else if (nextundone.equals(what)) {
+      currentAnnotationTask.updateNote(this.note.getText());
       next(true);
     } else if (save.equals(what)) {
+      currentAnnotationTask.updateNote(this.note.getText());
       saveDoc();
     } else if (saveandexit.equals(what)) {
+      currentAnnotationTask.updateNote(this.note.getText());
       saveDoc();
       System.exit(0);
     } else {
       int error = currentAnnotationTask.updateDocument(what);
+      currentAnnotationTask.updateNote(this.note.getText());
       if (error != -1 && config.autoadvance) {
         next(false);
       }
@@ -513,6 +516,12 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       optionsFrame.remove(optionsFrame.getComponentCount() - 1);
     }
     optionGroup = new ButtonGroup();
+    
+    // TODO: JP: always set the note field to editable!
+    // was previously only done in // HERE1
+    note.setBackground(Color.WHITE);
+    note.setEditable(true);
+    note.setText(currentAnnotationTask.note);
 
     for (int i = 0; i < currentAnnotationTask.options.length; i++) {
       JRadioButton button = new JRadioButton(i + 1 + ": " + currentAnnotationTask.options[i]);
@@ -520,10 +529,8 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       optionGroup.add(button);
       button.addActionListener(this);
       if (currentAnnotationTask.indexOfSelected == i) {
+        // HERE1
         button.setSelected(true);
-        this.note.setBackground(Color.WHITE);
-        this.note.setEditable(true);
-        this.note.setText(currentAnnotationTask.note);
       }
       button.setBackground(new Color(0.99F, 0.95F, 0.99F));
       optionsFrame.add(button);
@@ -535,9 +542,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       button.addActionListener(this);
       if (currentAnnotationTask.indexOfSelected == AnnotationTask.NONEOFABOVE) {
         button.setSelected(true);
-        this.note.setBackground(Color.WHITE);
-        this.note.setEditable(true);
-        this.note.setText(currentAnnotationTask.note);
+        // HERE1
       }
       button.setBackground(new Color(0.99F, 0.95F, 0.99F));
       optionsFrame.add(button);
@@ -549,9 +554,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       button.addActionListener(this);
       if (currentAnnotationTask.indexOfSelected == AnnotationTask.SPURIOUS) {
         button.setSelected(true);
-        this.note.setBackground(Color.WHITE);
-        this.note.setEditable(true);
-        this.note.setText(currentAnnotationTask.note);
+        // HERE1
       }
       button.setBackground(new Color(0.99F, 0.95F, 0.99F));
       optionsFrame.add(button);
@@ -563,9 +566,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       button.addActionListener(this);
       if (currentAnnotationTask.indexOfSelected == AnnotationTask.NIL) {
         button.setSelected(true);
-        this.note.setBackground(Color.WHITE);
-        this.note.setEditable(true);
-        this.note.setText(currentAnnotationTask.note);
+        // HERE1
       }
       button.setBackground(new Color(0.99F, 0.95F, 0.99F));
       optionsFrame.add(button);
@@ -576,9 +577,15 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
     button.addActionListener(this);
     if (currentAnnotationTask.indexOfSelected == AnnotationTask.UNDONE) {
       button.setSelected(true);
-      this.note.setBackground(Color.LIGHT_GRAY);
-      this.note.setText("");
-      this.note.setEditable(false);
+      // JP: This originally prevented the note to be editable, probably to avoid
+      // writing a note to an output annotation if the location is left undone.
+      // However, since selecting the button will immediately advance, there was 
+      // no way to add a note to a new annotatin.
+      // So instead we always show the note and just ignore it when the undone option is
+      // selected      
+      // this.note.setBackground(Color.LIGHT_GRAY);
+      // this.note.setText("");
+      // this.note.setEditable(false);
     }
     button.setBackground(Color.WHITE);
     optionsFrame.add(button);
