@@ -20,6 +20,7 @@ while [ -h "$PRG" ] ; do
 done
 SCRIPTDIR=`dirname "$PRG"`
 SCRIPTDIR=`cd "$SCRIPTDIR"; pwd -P`
+ROOTDIR=`cd "$SCRIPTDIR"; cd ..; pwd -P`
 
-java -cp ${SCRIPTDIR}/gate-SimpleManualAnnotator.jar:$GATE_HOME/bin/gate.jar:$GATE_HOME/lib/* gate.tools.SimpleManualAnnotator "$@"
+java -cp ${ROOTDIR}/gate-SimpleManualAnnotator.jar:$GATE_HOME/bin/gate.jar:$GATE_HOME/lib/* gate.tools.SimpleManualAnnotator "$@"
 
