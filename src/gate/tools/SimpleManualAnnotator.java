@@ -20,8 +20,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -199,7 +197,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
 
   private static void createAndShowGUI(final SimpleManualAnnotator sma) {
     //Create and set up the window.
-    frame.setPreferredSize(new Dimension(1400, 450));
+    frame.setPreferredSize(new Dimension(1400, 650));
     frame.setMinimumSize(new Dimension(50, 10));
 
     //Create and set up the content pane.
