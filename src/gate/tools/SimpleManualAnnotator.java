@@ -3,6 +3,7 @@ package gate.tools;
 import gate.Annotation;
 import gate.AnnotationSet;
 import gate.Document;
+import gate.DocumentExporter;
 import gate.Factory;
 import gate.Gate;
 import gate.Utils;
@@ -58,6 +59,8 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
   static String nextundone = "Next Undone";
   static String save = "Save";
   static String saveandexit = "Save and Exit";
+  
+  static DocumentExporter finfExporter;
 
   static JFrame frame = new JFrame("GATE Simple Manual Annotator");
   JButton lastUndoneButton, backButton, nextButton, undoneButton, saveButton, exitButton;
@@ -290,6 +293,10 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
   public static void main(String[] args) throws Exception {
     Gate.init();
     gate.Utils.loadPlugin("Format_FastInfoset");
+    finfExporter = (DocumentExporter)Gate.getCreoleRegister()
+            .get("gate.corpora.FastInfosetExporter")
+            .getInstantiations().iterator().next();
+            
     File[] corpus = new File[0];
 
     if (args.length != 2) {
@@ -535,6 +542,14 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       button.setBackground(new Color(0.99F, 0.95F, 0.99F));
       optionsFrame.add(button);
     }
+    if (config.includeNewValue) {
+      JRadioButton button = new JRadioButton("N: new ");
+      button.setActionCommand(AnnotationTask.NONEOFABOVE_LABEL);
+      optionGroup.add(button);
+      button.addActionListener(this);
+      button.setBackground(new Color(0.99F, 0.95F, 0.99F));
+      optionsFrame.add(button);
+    }
     if (config.includeNoneOfAbove) {
       JRadioButton button = new JRadioButton("Q: " + AnnotationTask.NONEOFABOVE_LABEL);
       button.setActionCommand(AnnotationTask.NONEOFABOVE_LABEL);
@@ -598,30 +613,19 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
 
   private void saveDoc() {
     if (currentDoc != null) {
-      FileWriter thisdocfile = null;
+      File docFile = corpus[currentDocIndex];
       try {
-        thisdocfile = new FileWriter(corpus[currentDocIndex]);
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-      if (thisdocfile != null) {
-        try {
-          thisdocfile.write(currentDoc.toXml());
-        } catch (IOException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
+        if(docFile.toString().endsWith(".finf")) {
+          finfExporter.export(currentDoc, docFile, Factory.newFeatureMap());
+          System.out.println("Document saved in FINF format: "+docFile.getAbsolutePath());
+        } else {
+          gate.corpora.DocumentStaxUtils.writeDocument(currentDoc,docFile);
+          System.out.println("Document saved in XML format: "+docFile.getAbsolutePath());
         }
-        try {
-          thisdocfile.close();
-        } catch (IOException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-      } else {
-        System.out.println("Failed to access " + currentDoc.getName() + " for writing!");
+      } catch (Exception e) {
+        System.err.println("Error when trying to save document "+docFile.getAbsolutePath());
+        e.printStackTrace(System.err);
       }
-      System.out.println("Document saved: "+currentDoc.getName());
     }
   }
 }

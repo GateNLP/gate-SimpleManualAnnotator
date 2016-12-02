@@ -17,6 +17,7 @@ public class AnnotationTask {
   static final int SPURIOUS = 10002;
   static final int UNDONE = 10003;
   static final int NIL = 10004;
+  static final int NEWVALUE = 10005;
 
   static final String NONEOFABOVE_LABEL = "<NONE OF ABOVE>";
   static final String SPURIOUS_LABEL = "<SPURIOUS>";

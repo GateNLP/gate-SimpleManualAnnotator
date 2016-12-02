@@ -22,6 +22,7 @@ public class Configuration {
 	boolean includeSpurious = true;
 	boolean autoadvance = true;
         boolean includeNIL = true;
+        boolean includeNewValue = true;
         String listSeparator = null;
 
 	Configuration (File conf) {
@@ -79,6 +80,10 @@ public class Configuration {
     	            case "includeNIL":
     	            	includeNIL = false;
     	            	if(pair[1].equals("true")) includeNIL = true;
+	                    break;
+    	            case "includeNewValue":
+    	            	includeNewValue = false;
+    	            	if(pair[1].equals("true")) includeNewValue = true;
 	                    break;
     	            case "listSeparator":
     	            	listSeparator = pair[1];
