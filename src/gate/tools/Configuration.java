@@ -22,7 +22,7 @@ public class Configuration {
 	boolean includeSpurious = true;
 	boolean autoadvance = true;
         boolean includeNIL = true;
-        boolean includeNewValue = true;
+        boolean includeNewValue = false;
         String listSeparator = null;
 
 	Configuration (File conf) {

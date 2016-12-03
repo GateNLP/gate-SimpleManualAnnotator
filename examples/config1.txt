@@ -10,6 +10,20 @@ outputASName = Key
 includeNoneOfAbove = true
 includeSpurious = true
 includeNIL = true
+includeNewValue = true
+
+#mode = OPTIONSFROMLISTANN
+#inputASName = null
+#contextType = Sentence
+#mentionType = LookupList
+#optionsType = MetaMap
+#optionsFeat = PreferredName
+#outputASName = Key
+#includeNoneOfAbove = true
+#includeSpurious = true
+#includeNIL = true
+#includeNewValue = true
+
 
 #mode = OPTIONSFROMFEATURE
 #inputASName = null
@@ -20,6 +34,7 @@ includeNIL = true
 #outputFeat = cui
 #includeNoneOfAbove = true
 #includeSpurious = true
+
 
 #mode = OPTIONSFROMSTRING
 #inputASName = null
