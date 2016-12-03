@@ -20,8 +20,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import org.xhtmlrenderer.layout.FloatLayoutResult;
 
 public class SimpleManualAnnotator extends JPanel implements ActionListener {
 
@@ -69,6 +68,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
   ButtonGroup optionGroup = new ButtonGroup();
   JPanel optionsFrame = new JPanel();
   JTextField note = new JTextField(10);
+  JTextField nvTextField = new JTextField();
 
 
   //Set at init
@@ -121,21 +121,41 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
     optionsContainer.add(optionsFrame, BorderLayout.WEST);
     dispFrame.add(optionsContainer);
 
-    JPanel noteFrame = new JPanel();
-    noteFrame.setLayout(new BoxLayout(noteFrame, BoxLayout.LINE_AXIS));
-    noteFrame.setPreferredSize(new Dimension(500, 47));
-    noteFrame.setBorder(BorderFactory.createMatteBorder(10, 10, 10, 10, Color.WHITE));
-    noteFrame.setBackground(Color.WHITE);
+    // The entry field for a new value: only used if this option is enabled    
+    if (config.includeNewValue) {
+      JPanel newValuePanel = new JPanel();
+      newValuePanel.setLayout(new BoxLayout(newValuePanel, BoxLayout.LINE_AXIS));
+      newValuePanel.setPreferredSize(new Dimension(500, 40));
+      newValuePanel.setBorder(BorderFactory.createMatteBorder(10, 10, 10, 10, Color.WHITE));
+      newValuePanel.setBackground(Color.WHITE);
+      JLabel vnLabel = new JLabel();
+      vnLabel.setText("New Value: ");
+      newValuePanel.add(vnLabel);
+      nvTextField.setEditable(true);
+      ScrollPane sp = new ScrollPane();
+      sp.add(nvTextField);
+      newValuePanel.add(sp);
+      dispFrame.add(newValuePanel);
+    }
+
+
+
+    JPanel notePanel = new JPanel();
+    notePanel.setLayout(new BoxLayout(notePanel, BoxLayout.LINE_AXIS));
+    notePanel.setPreferredSize(new Dimension(500, 40));
+    notePanel.setBorder(BorderFactory.createMatteBorder(10, 10, 10, 10, Color.WHITE));
+    notePanel.setBackground(Color.WHITE);
     JLabel noteLabel = new JLabel();
     noteLabel.setText("Note: ");
-    noteFrame.add(noteLabel);
+    notePanel.add(noteLabel);
     ScrollPane sp = new ScrollPane();
     note.setEditable(true);
     sp.add(note);
     note.setBackground(new Color(0.94F, 0.94F, 0.94F));
-    noteFrame.add(sp);
-    dispFrame.add(noteFrame);
+    notePanel.add(sp);
+    dispFrame.add(notePanel);
 
+    
     redisplay();
 
     JPanel buttonFrame = new JPanel();
@@ -199,7 +219,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
 
   private static void createAndShowGUI(final SimpleManualAnnotator sma) {
     //Create and set up the window.
-    frame.setPreferredSize(new Dimension(1400, 450));
+    frame.setPreferredSize(new Dimension(1400, 650));
     frame.setMinimumSize(new Dimension(50, 10));
 
     //Create and set up the content pane.
@@ -235,56 +255,56 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       switch (e.getKeyCode()) {
         case KeyEvent.VK_LEFT:
         case KeyEvent.VK_UP:
-          act(back);
+          act(back,"");
           break;
         case KeyEvent.VK_RIGHT:
         case KeyEvent.VK_DOWN:
-          act(next);
+          act(next,"");
           break;
         case KeyEvent.VK_Q:
-          act(AnnotationTask.NONEOFABOVE_LABEL);
+          act(AnnotationTask.NONEOFABOVE_LABEL,"");
           break;
         case KeyEvent.VK_A:
-          act(AnnotationTask.SPURIOUS_LABEL);
+          act(AnnotationTask.SPURIOUS_LABEL,"");
           break;
         case KeyEvent.VK_Z:
-          act(AnnotationTask.UNDONE_LABEL);
+          act(AnnotationTask.UNDONE_LABEL,"");
           break;
         case KeyEvent.VK_1:
         case KeyEvent.VK_NUMPAD1:
-          act("option0"); //It expects index
+          act("option0",""); //It expects index
           break;
         case KeyEvent.VK_2:
         case KeyEvent.VK_NUMPAD2:
-          act("option1");
+          act("option1","");
           break;
         case KeyEvent.VK_3:
         case KeyEvent.VK_NUMPAD3:
-          act("option2");
+          act("option2","");
           break;
         case KeyEvent.VK_4:
         case KeyEvent.VK_NUMPAD4:
-          act("option3");
+          act("option3","");
           break;
         case KeyEvent.VK_5:
         case KeyEvent.VK_NUMPAD5:
-          act("option4");
+          act("option4","");
           break;
         case KeyEvent.VK_6:
         case KeyEvent.VK_NUMPAD6:
-          act("option5");
+          act("option5","");
           break;
         case KeyEvent.VK_7:
         case KeyEvent.VK_NUMPAD7:
-          act("option6");
+          act("option6","");
           break;
         case KeyEvent.VK_8:
         case KeyEvent.VK_NUMPAD8:
-          act("option7");
+          act("option7","");
           break;
         case KeyEvent.VK_9:
         case KeyEvent.VK_NUMPAD9:
-          act("option8");
+          act("option8","");
           break;
       }
     }
@@ -326,10 +346,10 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
 
   @Override
   public void actionPerformed(ActionEvent ev) {
-    act(ev.getActionCommand());
+    act(ev.getActionCommand(),ev.getSource());
   }
 
-  public void act(String what) {
+  public void act(String what, Object evSource) {
 
     if (backundone.equals(what)) {
       currentAnnotationTask.updateNote(this.note.getText());
@@ -351,8 +371,13 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       saveDoc();
       System.exit(0);
     } else {
-      int error = currentAnnotationTask.updateDocument(what);
-      currentAnnotationTask.updateNote(this.note.getText());
+      String newValue = "";
+      if(what.equals("<NEWVALUE>")) {
+        newValue = ((RadioButtonForTextEntry)evSource).getTextField().getText();
+        ((RadioButtonForTextEntry)evSource).getTextField().setText("");
+      }
+      int error = currentAnnotationTask.updateDocument(what,newValue);
+      currentAnnotationTask.updateNote(note.getText());
       if (error != -1 && config.autoadvance) {
         next(false);
       }
@@ -498,6 +523,8 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       return;
     }
     progress.setText(progressReport());
+    
+    nvTextField.setText("");
 
     int start = new Long(currentAnnotationTask.startOfMention - currentAnnotationTask.offset).intValue();
     if (start < 0) {
@@ -542,14 +569,6 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       button.setBackground(new Color(0.99F, 0.95F, 0.99F));
       optionsFrame.add(button);
     }
-    if (config.includeNewValue) {
-      JRadioButton button = new JRadioButton("N: new ");
-      button.setActionCommand(AnnotationTask.NONEOFABOVE_LABEL);
-      optionGroup.add(button);
-      button.addActionListener(this);
-      button.setBackground(new Color(0.99F, 0.95F, 0.99F));
-      optionsFrame.add(button);
-    }
     if (config.includeNoneOfAbove) {
       JRadioButton button = new JRadioButton("Q: " + AnnotationTask.NONEOFABOVE_LABEL);
       button.setActionCommand(AnnotationTask.NONEOFABOVE_LABEL);
@@ -585,6 +604,18 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       }
       button.setBackground(new Color(0.99F, 0.95F, 0.99F));
       optionsFrame.add(button);
+    }
+    if (config.includeNewValue) {
+      JRadioButton button = new RadioButtonForTextEntry("N: new ",nvTextField);
+      button.setActionCommand(AnnotationTask.NEWVALUE_LABEL);
+      optionGroup.add(button);
+      button.addActionListener(this);
+      button.setBackground(new Color(0.99F, 0.95F, 0.99F));
+      optionsFrame.add(button);
+      if(currentAnnotationTask != null && !currentAnnotationTask.newValue.isEmpty()) {
+        nvTextField.setText(currentAnnotationTask.newValue);
+        button.setSelected(true);
+      }
     }
     JRadioButton button = new JRadioButton("Z: " + AnnotationTask.UNDONE_LABEL);
     button.setActionCommand(AnnotationTask.UNDONE_LABEL);
@@ -628,4 +659,18 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
       }
     }
   }
+  
+  // A radio button that also holds a reference to a text entry field so
+  // the content of that field can be accessed if we get an event from the radio button
+  public static class RadioButtonForTextEntry extends JRadioButton {
+    private JTextField textField;
+    public RadioButtonForTextEntry(String text, JTextField tf) {
+      super(text);
+      textField = tf;
+    }
+    public JTextField getTextField() { return textField; }    
+  }
+
+  
 }
+

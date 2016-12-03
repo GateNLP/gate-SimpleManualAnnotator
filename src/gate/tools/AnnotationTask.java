@@ -23,6 +23,7 @@ public class AnnotationTask {
   static final String SPURIOUS_LABEL = "<SPURIOUS>";
   static final String UNDONE_LABEL = "<NOT DONE>";
   static final String NIL_LABEL = "<NIL>";
+  static final String NEWVALUE_LABEL = "<NEWVALUE>";
   
   static final String NIL_VALUE = "";
 
@@ -41,6 +42,7 @@ public class AnnotationTask {
   Annotation previouslySelected = null;
   int indexOfSelected = UNDONE;
   String note;
+  String newValue = "";
 
   AnnotationTask(Annotation thisAnn, Configuration config, Document currentDoc) {
     this.config = config;
@@ -49,6 +51,8 @@ public class AnnotationTask {
     AnnotationSet outputAS = currentDoc.getAnnotations(config.outputASName);
     AnnotationSet previous = Utils.getCoextensiveAnnotations(outputAS, thisAnn);
     Object prev = null;
+    
+    boolean havePrevious = false;
 
     if (previous.size() == 1) {
       previouslySelected = Utils.getOnlyAnn(previous);
@@ -75,6 +79,9 @@ public class AnnotationTask {
           indexOfSelected = SPURIOUS;
         } else if (prev != null && prev.equals(UNDONE_LABEL)) {
           indexOfSelected = UNDONE;
+        } else {
+          //System.err.println("DEBUG: !!! Other existing value "+prev);
+          havePrevious = true;
         }
       }
     }
@@ -205,9 +212,14 @@ public class AnnotationTask {
         }
         break;
     }
+    if(config.includeNewValue && indexOfSelected == UNDONE && havePrevious) {
+      newValue = (String)prev;
+      indexOfSelected = NEWVALUE;
+    }
   }
 
-  public int updateDocument(String action) {
+  public int updateDocument(String action, String newValue) {
+    //System.err.println("DEBUG: calling updateDocument with action/newValue "+action+"/"+newValue);
     AnnotationSet outputAS = currentDoc.getAnnotations(config.outputASName);
 
     //Always start by removing whatever is there
@@ -225,6 +237,10 @@ public class AnnotationTask {
           fm.put(config.optionsFeat, AnnotationTask.SPURIOUS_LABEL);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
           this.indexOfSelected = AnnotationTask.SPURIOUS;
+        } else if (AnnotationTask.NEWVALUE_LABEL.equals(action)) {
+          //System.err.println("DEBUG: dealing with newvalue - TODO");
+          fm.put(config.optionsFeat, newValue);
+          Utils.addAnn(outputAS, mention, config.mentionType, fm);
         } else if (AnnotationTask.NIL_LABEL.equals(action)) {
           fm.put(config.outputFeat, AnnotationTask.NIL_VALUE);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
@@ -253,6 +269,10 @@ public class AnnotationTask {
           fm.put(config.optionsFeat, AnnotationTask.SPURIOUS_LABEL);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
           this.indexOfSelected = AnnotationTask.SPURIOUS;
+        } else if (AnnotationTask.NEWVALUE_LABEL.equals(action)) {
+          //System.err.println("DEBUG: dealing with newvalue - TODO");
+          fm.put(config.optionsFeat, newValue);
+          Utils.addAnn(outputAS, mention, config.mentionType, fm);
         } else if (AnnotationTask.NIL_LABEL.equals(action)) {
           fm.put(config.outputFeat, AnnotationTask.NIL_VALUE);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
@@ -281,6 +301,10 @@ public class AnnotationTask {
           fm.put(config.outputFeat, AnnotationTask.SPURIOUS_LABEL);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
           this.indexOfSelected = AnnotationTask.SPURIOUS;
+        } else if (AnnotationTask.NEWVALUE_LABEL.equals(action)) {
+          //System.err.println("DEBUG: dealing with newvalue - TODO");
+          fm.put(config.optionsFeat, newValue);
+          Utils.addAnn(outputAS, mention, config.mentionType, fm);
         } else if (AnnotationTask.NIL_LABEL.equals(action)) {
           fm.put(config.outputFeat, AnnotationTask.NIL_VALUE);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
@@ -304,6 +328,10 @@ public class AnnotationTask {
           fm.put(config.outputFeat, AnnotationTask.SPURIOUS_LABEL);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
           this.indexOfSelected = AnnotationTask.SPURIOUS;
+        } else if (AnnotationTask.NEWVALUE_LABEL.equals(action)) {
+          //System.err.println("DEBUG: dealing with newvalue - TODO");
+          fm.put(config.optionsFeat, newValue);
+          Utils.addAnn(outputAS, mention, config.mentionType, fm);
         } else if (AnnotationTask.NIL_LABEL.equals(action)) {
           fm.put(config.outputFeat, AnnotationTask.NIL_VALUE);
           Utils.addAnn(outputAS, mention, config.mentionType, fm);
@@ -334,7 +362,9 @@ public class AnnotationTask {
       Annotation ann = anns.iterator().next();
       ann.getFeatures().put(noteType, this.note);
     } else {
-      System.err.println("WARNING: note for UNDONE ignored in document "+currentDoc.getName()+": "+note);
+      if(!note.trim().isEmpty()) {
+        System.err.println("WARNING: note for UNDONE ignored in document "+currentDoc.getName()+": "+note);
+      }
     }
   }
 }

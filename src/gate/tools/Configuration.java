@@ -35,7 +35,7 @@ public class Configuration {
     	    String line;
     	    while ((line = br.readLine()) != null) {
     	       if(!line.startsWith("#") && line.contains(" = ")){
-    	    	   String[] pair = line.split(" = ",-1);
+    	    	   String[] pair = line.split("\\s+=\\s+",-1);
     	    	   switch (pair[0]) {
     	            case "mode":
     	            	mode = Mode.valueOf(pair[1]);
@@ -71,26 +71,26 @@ public class Configuration {
 	                    break;
     	            case "includeNoneOfAbove":
     	            	includeNoneOfAbove = false;
-    	            	if(pair[1].equals("true")) includeNoneOfAbove = true;
+    	            	if(pair[1].toLowerCase().equals("true")) includeNoneOfAbove = true;
 	                    break;
     	            case "includeSpurious":
     	            	includeSpurious = false;
-    	            	if(pair[1].equals("true")) includeSpurious = true;
+    	            	if(pair[1].toLowerCase().equals("true")) includeSpurious = true;
 	                    break;
     	            case "includeNIL":
     	            	includeNIL = false;
-    	            	if(pair[1].equals("true")) includeNIL = true;
+    	            	if(pair[1].toLowerCase().equals("true")) includeNIL = true;
 	                    break;
     	            case "includeNewValue":
     	            	includeNewValue = false;
-    	            	if(pair[1].equals("true")) includeNewValue = true;
+    	            	if(pair[1].toLowerCase().equals("true")) includeNewValue = true;
 	                    break;
     	            case "listSeparator":
     	            	listSeparator = pair[1];
 	                    break;
     	            case "autoadvance":
     	            	autoadvance = true;
-    	            	if(pair[1].equals("false")) autoadvance = false;
+    	            	if(pair[1].toLowerCase().equals("false")) autoadvance = false;
 	                    break;
     	    	   }    	    			   
     	       }
