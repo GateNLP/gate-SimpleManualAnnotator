@@ -86,7 +86,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
   public SimpleManualAnnotator(File conf, File[] corpus) {
     config = new Configuration(conf);
     this.corpus = corpus;
-    next(true);
+    next(true && config.undoneOnly);
 
     JPanel dispFrame = new JPanel();
     dispFrame.setLayout(new BoxLayout(dispFrame, BoxLayout.Y_AXIS));

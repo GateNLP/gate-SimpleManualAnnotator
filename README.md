@@ -28,6 +28,9 @@ Your corpus of GATE documents needs to be prepared with annotations that describ
 generated "NIL" option? This would be used to indicate that the mention is valid, but is known to not
 refer to any value. For example, when annotating the URI for locations, if the mention is indeed a location,
 but there is no URI to link it to, this would be the proper option to indicate that.
+- includeNewValue - If set to true (default is false), then an entry field to specify a new value manually is displayed. 
+- undoneOnly - If true (the default), skip over annotations where a selection has already been made. If set to "false" will never skip. Note that annotations marked as "none of above" are also considered done, so will not be re-visited unless this is set to false. 
+
 
 **OPTIONSFROMSTRING**
 
