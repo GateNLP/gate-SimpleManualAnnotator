@@ -2,15 +2,15 @@
 
 Swing interface allowing fast manual annotation of a local directory of GATE documents.
 
-##Overview
+## Overview
 
 This annotation tool allows you to quickly annotate a directory of GATE documents stored locally. It is suitable for tasks such as accepting or rejecting automatically generated annotations in text or selecting from several options. It presents each annotation to be reviewed in a clear and simple way with key press options allowing one of a short list of options to be selected quickly, without mouse use, facilitating an annotation rate in the region of one every couple of seconds depending on task complexity. Annotation choices are written back onto the GATE documents.
 
 An example task might be, for every Person annotation that appears in the corpus, to accept or reject that annotation as an accurate identification of a person mention. Alternatively you might have Mention annotations to be annotated as either Person, Location or Organization. Alternatively you might have Mention annotations each of which has a different set of possibilities for what that Mention is.
 
-##Setup
+## Setup
 
-###Configuring the Task
+### Configuring the Task
 
 Your corpus of GATE documents needs to be prepared with annotations that describe what annotations you want to be presented to the annotator (hereafter referred to as "mentions"), and what options they should be presented with. Three modes are available for you to choose between depending on your task and data. The task is defined in the configuration file, which is passed to the annotation tool on startup, an example of which is provided, and in here you will choose your mode and specify the required options. We begin by listing options that pertain to all three modes, before discussing each mode separately.
 
@@ -56,7 +56,7 @@ This option indicates that choices are to be found on a separate annotation type
 - optionsType - The annotation type that defines the choice, for example "Candidate".
 - optionsFeat = The feature indicating the textual string to be presented describing the choice. For example, "Candidate" annotations may have a feature called "PreferredName".
 
-###Running the Tool
+### Running the Tool
 
 To run, the annotator requires the GATE jar as well as the GATE lib directory so something like this should work:
 
@@ -64,7 +64,7 @@ java -cp gate-SimpleManualAnnotator.jar:$GATE_HOME/bin/gate.jar:$GATE_HOME/lib/*
 
 A shell script is provided with the distribution.
 
-##Usage
+## Usage
 
 ![GATE Simple Manual Annotator screenshot](https://github.com/GateNLP/gate-SimpleManualAnnotator/raw/master/doc/Screenshot-GATESimpleManualAnnotator.png "GATE Simple Manual Annotator screenshot")
 
