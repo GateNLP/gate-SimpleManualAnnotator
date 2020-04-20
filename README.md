@@ -10,6 +10,10 @@ An example task might be, for every Person annotation that appears in the corpus
 
 ## Setup
 
+### Compile
+
+Run `mvn package`
+
 ### Configuring the Task
 
 Your corpus of GATE documents needs to be prepared with annotations that describe what annotations you want to be presented to the annotator (hereafter referred to as "mentions"), and what options they should be presented with. Three modes are available for you to choose between depending on your task and data. The task is defined in the configuration file, which is passed to the annotation tool on startup, an example of which is provided, and in here you will choose your mode and specify the required options. We begin by listing options that pertain to all three modes, before discussing each mode separately.
@@ -58,11 +62,16 @@ This option indicates that choices are to be found on a separate annotation type
 
 ### Running the Tool
 
-To run, the annotator requires the GATE jar as well as the GATE lib directory so something like this should work:
+To run, the annotator requires the GATE jar and GATE lib jars as well as the jar for this software (target/simplemanualannotator-2.0-SNAPSHOT.jar).
+Run class `gate.tools.SimpleManualAnnotator` and pass two arguments, the config file and the directory with GATE documents to annotate.
 
-java -cp gate-SimpleManualAnnotator.jar:$GATE_HOME/bin/gate.jar:$GATE_HOME/lib/* gate.tools.SimpleManualAnnotator \<config file\> \<directory of GATE documents\>
+Something similar to:
 
-A shell script is provided with the distribution.
+`java -cp "target/simplemanualannotator-2.0-SNAPSHOT.jar:$GATE_HOME/lib/*" gate.tools.SimpleManualAnnotator examples/config1.txt examples/corpus1/`
+
+On Linux-like operating systems the shell script in the `./bin` directory can be used if the environment variable `GATE_HOME` is set and points to the root directory of a GATE installation:
+
+`./bin/gateManualAnnotator.sh examples/config1.txt examples/corpus1/`
 
 ## Usage
 
