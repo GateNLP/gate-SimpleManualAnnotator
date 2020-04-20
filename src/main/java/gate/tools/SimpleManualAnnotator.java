@@ -7,6 +7,7 @@ import gate.DocumentExporter;
 import gate.Factory;
 import gate.Gate;
 import gate.Utils;
+import gate.creole.Plugin;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -312,7 +313,7 @@ public class SimpleManualAnnotator extends JPanel implements ActionListener {
 
   public static void main(String[] args) throws Exception {
     Gate.init();
-    gate.Utils.loadPlugin("Format_FastInfoset");
+    Gate.getCreoleRegister().registerPlugin(new Plugin.Maven("uk.ac.gate.plugins","format-fastinfoset","8.5"));
     finfExporter = (DocumentExporter)Gate.getCreoleRegister()
             .get("gate.corpora.FastInfosetExporter")
             .getInstantiations().iterator().next();
